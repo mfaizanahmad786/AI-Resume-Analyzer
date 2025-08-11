@@ -1,10 +1,25 @@
-import React from 'react'
 import { Button } from './ui/button'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/context/Context'
 
 const Header = () => {
-
     const navigate = useNavigate();
+    const auth = useAuth();
+    
+    if (!auth) {
+        return null; // or a loading state
+    }
+    
+    const { user, logout } = auth;
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    };
 
     return (
         <header className='w-full pt-6 sm:pt-8 lg:pt-10 px-4 sm:px-6'>
@@ -13,20 +28,34 @@ const Header = () => {
                     <div className='px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0'>
                         <h1 className='font-bold text-xl sm:text-2xl text-gray-800'>RESUMIND</h1>
                         <div className='flex flex-col sm:flex-row gap-2 sm:gap-0 w-full sm:w-auto'>
-                        <Button 
-                            variant={'default'} 
-                            className='bg-violet-500 hover:bg-purple-600 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer text-sm sm:text-base w-full sm:w-auto'
-                            onClick={()=> navigate('/upload')}
-                        >
-                            Upload Resume
-                        </Button>
-                        <Button 
-                            variant={'default'} 
-                            className='bg-violet-500 hover:bg-purple-600 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer text-sm sm:text-base w-full sm:w-auto sm:ml-5'
-                            onClick={()=> navigate('/login')}
-                        >
-                            Log In
-                        </Button>
+                            {user ? (
+                                // Show Upload Resume and Logout buttons when logged in
+                                <>
+                                    <Button 
+                                        variant={'default'} 
+                                        className='bg-violet-500 hover:bg-purple-600 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer text-sm sm:text-base w-full sm:w-auto'
+                                        onClick={()=> navigate('/upload')}
+                                    >
+                                        Upload Resume
+                                    </Button>
+                                    <Button 
+                                        variant={'default'} 
+                                        className='bg-red-500 hover:bg-red-600 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer text-sm sm:text-base w-full sm:w-auto sm:ml-5'
+                                        onClick={handleLogout}
+                                    >
+                                        Log Out
+                                    </Button>
+                                </>
+                            ) : (
+                                // Show only Login button when not logged in
+                                <Button 
+                                    variant={'default'} 
+                                    className='bg-violet-500 hover:bg-purple-600 text-white px-4 sm:px-6 py-2 rounded-lg cursor-pointer text-sm sm:text-base w-full sm:w-auto'
+                                    onClick={()=> navigate('/login')}
+                                >
+                                    Log In
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </div>

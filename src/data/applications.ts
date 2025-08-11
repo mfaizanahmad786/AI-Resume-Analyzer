@@ -1,4 +1,4 @@
-import type { Feedback } from "@/types";
+import type { Feedback, Resume } from "@/types";
 
 export const resumes: Resume[] = [
   {

@@ -15,6 +15,7 @@ const UploadResume = () => {
   });
 
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleInputChange = (field: string, value: string) => {
@@ -37,27 +38,62 @@ const UploadResume = () => {
     e.preventDefault();
     
     if (!formData.pdfFile || !formData.companyName || !formData.jobTitle) {
-      alert('Please fill all required fields and upload a PDF');
+      setError('Please fill all required fields and upload a PDF');
+      return;
+    }
+
+    if (formData.pdfFile.type !== 'application/pdf') {
+      setError('Please upload a PDF file');
+      return;
+    }
+
+    // Validate file size (e.g., max 10MB)
+    if (formData.pdfFile.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB');
       return;
     }
 
     setIsUploading(true);
+    setError('');
     
     try {
-      // Convert PDF to base64 for storage
+      console.log('Preparing for AI analysis...');
+      
+      // Store form data for the loading page to use
+      const formDataForAnalysis = {
+        companyName: formData.companyName,
+        jobTitle: formData.jobTitle,
+        jobDescription: formData.jobDescription,
+        fileName: formData.pdfFile.name,
+        timestamp: new Date().toISOString()
+      };
+
+      // Convert PDF to base64 first
       const reader = new FileReader();
       reader.onload = () => {
         const pdfBase64 = reader.result as string;
         
-        // Store in sessionStorage
+        // Store all data needed for analysis
+        sessionStorage.setItem('pendingAnalysis', JSON.stringify(formDataForAnalysis));
         sessionStorage.setItem('uploadedPDF', pdfBase64);
         sessionStorage.setItem('pdfFileName', formData.pdfFile!.name);
         sessionStorage.setItem('companyName', formData.companyName);
         sessionStorage.setItem('jobTitle', formData.jobTitle);
         sessionStorage.setItem('jobDescription', formData.jobDescription);
+        sessionStorage.setItem('uploadInProgress', 'true');
         
-        // Navigate to review page
-        navigate('/resumereview');
+        // Store the actual file for analysis (we'll need to reconstruct it in the loading page)
+        const arrayBuffer = new ArrayBuffer(pdfBase64.length);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const binaryString = atob(pdfBase64.split(',')[1]);
+        for (let i = 0; i < binaryString.length; i++) {
+          uint8Array[i] = binaryString.charCodeAt(i);
+        }
+        
+        console.log('Data prepared, navigating to analysis loading page...');
+        
+        // Navigate to loading page which will handle the AI analysis
+        navigate('/analysis-loading');
       };
       
       reader.onerror = () => {
@@ -66,9 +102,9 @@ const UploadResume = () => {
       
       reader.readAsDataURL(formData.pdfFile);
       
-    } catch (error) {
-      console.error('Error processing PDF:', error);
-      alert('Failed to process PDF file');
+    } catch (error: any) {
+      console.error('Preparation error:', error);
+      setError(error.message || 'Failed to prepare resume for analysis. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -107,6 +143,13 @@ const UploadResume = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error display */}
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
+
             {/* Company Name */}
             <div className="space-y-2">
               <Label htmlFor="company" className="text-sm font-medium text-gray-700">
@@ -205,12 +248,18 @@ const UploadResume = () => {
               {isUploading ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Processing...
+                  Analyzing with AI...
                 </div>
               ) : (
-                'Save & Analyze Resume'
+                'Analyze Resume with AI'
               )}
             </Button>
+            
+            {isUploading && (
+              <p className="text-center text-sm text-gray-600 mt-2">
+                Please wait, this may take 10-30 seconds...
+              </p>
+            )}
           </form>
         </div>
       </div>

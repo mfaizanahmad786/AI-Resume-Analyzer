@@ -4,7 +4,8 @@ import ReviewHeader from '@/components/ReviewHeader';
 import ScoreGauge from '@/components/ScoreGauge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { convertPdfToImage, getPdfPageCount } from '../utils/pdfToImage';
-import type { Feedback } from '@/types';
+
+import { useAnalysis } from '@/context/AnalysisContext';
 
 interface AnalysisData {
   companyName: string;
@@ -14,8 +15,10 @@ interface AnalysisData {
   pdfData: string;
 }
 
-const ResumeReview = ({ response }: { response: Feedback }) => {
-  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+const ResumeReview = () => {
+  const { analysisData: aiResponse, isAnalysisAvailable } = useAnalysis()
+
+  const [pdfDisplayData, setPdfDisplayData] = useState<AnalysisData | null>(null);
   const [resumeImage, setResumeImage] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -25,9 +28,15 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if we have analysis data from context
+    if (!isAnalysisAvailable || !aiResponse) {
+      navigate('/upload');
+      return;
+    }
+
     const loadAnalysisData = async () => {
       try {
-        // Get data from sessionStorage
+        // Get data from sessionStorage for PDF display
         const pdfData = sessionStorage.getItem('uploadedPDF');
         const fileName = sessionStorage.getItem('pdfFileName');
         const companyName = sessionStorage.getItem('companyName');
@@ -47,7 +56,7 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
           jobDescription: jobDescription || ''
         };
 
-        setAnalysisData(data);
+        setPdfDisplayData(data);
 
         // Get PDF info
         setIsConverting(true);
@@ -72,16 +81,16 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
     };
 
     loadAnalysisData();
-  }, [navigate]);
+  }, [navigate, isAnalysisAvailable, aiResponse]);
 
   const handlePageChange = async (pageNumber: number) => {
-    if (!analysisData || pageNumber === currentPage) return;
+    if (!pdfDisplayData || pageNumber === currentPage) return;
 
     try {
       setIsConverting(true);
       setCurrentPage(pageNumber);
 
-      const imageDataUrl = await convertPdfToImage(analysisData.pdfData, {
+      const imageDataUrl = await convertPdfToImage(pdfDisplayData.pdfData, {
         pageNumber,
         scale: 2.0,
         format: 'png'
@@ -161,7 +170,7 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
     }
   }
 
-  if (!analysisData && !error) {
+  if (!pdfDisplayData && !error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -175,8 +184,8 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <ReviewHeader
-        companyName={analysisData?.companyName || ''}
-        jobTitle={analysisData?.jobTitle || ''}
+        companyName={pdfDisplayData?.companyName || ''}
+        jobTitle={pdfDisplayData?.jobTitle || ''}
       />
 
       <div className="mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 lg:py-8 w-full">
@@ -260,7 +269,7 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
               <div className="text-center mb-4">
                 <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-2">Your Resume Score</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">This score is calculated based on the variables listed below</p>
-                <ScoreGauge score={response.overallScore} />
+                <ScoreGauge score={aiResponse?.analysis?.overallScore || 0} />
                 
               </div>
             </div>
@@ -270,56 +279,56 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
               <div className="flex justify-between items-center bg-[#FAFAFA] p-2 sm:p-3 rounded">
                 <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
                   <span className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Tone & Style</span>
-                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(response.toneAndStyle.score)}`}>{getCategory(response.toneAndStyle.score)}</span>
+                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(aiResponse?.analysis?.toneAndStyle?.score || 0)}`}>{getCategory(aiResponse?.analysis?.toneAndStyle?.score || 0)}</span>
                 </div>
-                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{response.toneAndStyle.score}/100</span>
+                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{aiResponse?.analysis?.toneAndStyle?.score || 0}/100</span>
               </div>
               
 
               <div className="flex justify-between items-center bg-[#FAFAFA] p-2 sm:p-3 rounded">
                 <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
                   <span className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Content</span>
-                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(response.content.score)}`}>{getCategory(response.content.score)}</span>
+                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(aiResponse?.analysis?.content?.score || 0)}`}>{getCategory(aiResponse?.analysis?.content?.score || 0)}</span>
                 </div>
-                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{response.content.score}/100</span>
+                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{aiResponse?.analysis?.content?.score || 0}/100</span>
               </div>
               
 
               <div className="flex justify-between items-center bg-[#FAFAFA] p-2 sm:p-3 rounded">
                 <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
                   <span className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Structure</span>
-                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(response.structure.score)}`}>{getCategory(response.structure.score)}</span>
+                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(aiResponse?.analysis?.structure?.score || 0)}`}>{getCategory(aiResponse?.analysis?.structure?.score || 0)}</span>
                 </div>
-                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{response.structure.score}/100</span>
+                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{aiResponse?.analysis?.structure?.score || 0}/100</span>
               </div>
               
 
               <div className="flex justify-between items-center bg-[#FAFAFA] p-2 sm:p-3 rounded">
                 <div className="flex items-center gap-1 sm:gap-2 min-w-0 flex-1">
                   <span className="font-medium text-gray-900 text-xs sm:text-sm lg:text-base truncate">Skills</span>
-                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(response.skills.score)}`}>{getCategory(response.skills.score)}</span>
+                  <span className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded flex-shrink-0 ${getCategoryStyle(aiResponse?.analysis?.skills?.score || 0)}`}>{getCategory(aiResponse?.analysis?.skills?.score || 0)}</span>
                 </div>
-                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{response.skills.score}/100</span>
+                <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 flex-shrink-0">{aiResponse?.analysis?.skills?.score || 0}/100</span>
               </div>
             
             </div>
 
             {/* ATS Score Section */}
-            <div className={`rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 border shadow-md ${getAtsStyle(response.ATS.score)} ${
-              getATSCategory(response.ATS.score) === 'good' ? 'border-teal-200' : 
-              getATSCategory(response.ATS.score) === 'warning' ? 'border-yellow-200' : 'border-red-200'
+            <div className={`rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 border shadow-md ${getAtsStyle(aiResponse?.analysis?.ATS?.score || 0)} ${
+              getATSCategory(aiResponse?.analysis?.ATS?.score || 0) === 'good' ? 'border-teal-200' : 
+              getATSCategory(aiResponse?.analysis?.ATS?.score || 0) === 'warning' ? 'border-yellow-200' : 'border-red-200'
             }`}>
               <div className="flex items-start sm:items-center gap-3 mb-3">
-                <img src={getATSIcon(response.ATS.score)} alt={`${getATSCategory(response.ATS.score)} ATS Score`} className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
+                <img src={getATSIcon(aiResponse?.analysis?.ATS?.score || 0)} alt={`${getATSCategory(aiResponse?.analysis?.ATS?.score || 0)} ATS Score`} className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">ATS Score - {response.ATS.score}/100</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">ATS Score - {aiResponse?.analysis?.ATS?.score || 0}/100</h3>
                   <p className="text-xs sm:text-sm text-gray-600">How well does your resume pass through Applicant Tracking Systems?</p>
                 </div>
               </div>
               <p className="text-xs sm:text-sm text-gray-700 mb-4">Your resume matches some keywords and skills preferred by the employer: Here's how it performed:</p>
 
               <div className="space-y-2">
-                {response.ATS.tips.map((tip, index) => (
+                {aiResponse?.analysis?.ATS?.tips?.map((tip, index) => (
                   <div key={index} className="flex items-start gap-2 text-xs sm:text-sm">
                     <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
                       tip.type === 'good' ? 'bg-green-500' : 'bg-yellow-500'
@@ -332,7 +341,7 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                       {tip.tip}
                     </span>
                   </div>
-                ))}
+                )) || []}
               </div>
 
               <p className="text-xs sm:text-sm text-gray-600 mt-4 italic">Want a better score? Improve your resume by applying the suggestions listed below</p>
@@ -344,14 +353,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                 <AccordionTrigger className="hover:no-underline text-left">
                   <div className="flex items-center justify-between w-full">
                     <span className="font-medium mr-2 text-sm sm:text-base">Tone & Style</span>
-                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(response.toneAndStyle.score)}`}>{response.toneAndStyle.score}/100</span>
+                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(aiResponse?.analysis?.toneAndStyle?.score || 0)}`}>{aiResponse?.analysis?.toneAndStyle?.score || 0}/100</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
                     {/* Summary Tips Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                      {response.toneAndStyle.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.toneAndStyle?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
                             src={tip.type === 'good' ? "src/assets/public/icons/check.svg" : "src/assets/public/icons/warning.svg"} 
@@ -360,12 +369,12 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                           />
                           <span className="text-xs sm:text-sm font-medium text-gray-700">{tip.tip}</span>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
 
                     {/* Detailed Explanation Boxes */}
                     <div className="space-y-3 sm:space-y-4">
-                      {response.toneAndStyle.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.toneAndStyle?.tips?.map((tip, index) => (
                         <div key={index} className={`${
                           tip.type === 'good' ? 'bg-teal-50 border-teal-200' : 'bg-yellow-50 border-yellow-200'
                         } border rounded-lg p-3 sm:p-4`}>
@@ -384,14 +393,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                               <ul className={`text-xs sm:text-sm list-disc list-inside space-y-1 ${
                                 tip.type === 'good' ? 'text-teal-700' : 'text-yellow-700'
                               }`}>
-                                {tip.points.map((point, pointIndex) => (
+                                {tip.points?.map((point, pointIndex) => (
                                   <li key={pointIndex}>{point}</li>
-                                ))}
+                                )) || []}
                               </ul>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
                   </div>
                 </AccordionContent>
@@ -401,14 +410,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                 <AccordionTrigger className="hover:no-underline text-left">
                   <div className="flex items-center justify-between w-full">
                     <span className="font-medium mr-2 text-sm sm:text-base">Content</span>
-                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(response.content.score)}`}>{response.content.score}/100</span>
+                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(aiResponse?.analysis?.content?.score || 0)}`}>{aiResponse?.analysis?.content?.score || 0}/100</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
                     {/* Summary Tips Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                      {response.content.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.content?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
                             src={tip.type === 'good' ? "src/assets/public/icons/check.svg" : "src/assets/public/icons/warning.svg"} 
@@ -417,12 +426,12 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                           />
                           <span className="text-xs sm:text-sm font-medium text-gray-700">{tip.tip}</span>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
 
                     {/* Detailed Explanation Boxes */}
                     <div className="space-y-3 sm:space-y-4">
-                      {response.content.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.content?.tips?.map((tip, index) => (
                         <div key={index} className={`${
                           tip.type === 'good' ? 'bg-teal-50 border-teal-200' : 'bg-yellow-50 border-yellow-200'
                         } border rounded-lg p-3 sm:p-4`}>
@@ -441,14 +450,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                               <ul className={`text-xs sm:text-sm list-disc list-inside space-y-1 ${
                                 tip.type === 'good' ? 'text-teal-700' : 'text-yellow-700'
                               }`}>
-                                {tip.points.map((point, pointIndex) => (
+                                {tip.points?.map((point, pointIndex) => (
                                   <li key={pointIndex}>{point}</li>
-                                ))}
+                                )) || []}
                               </ul>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
                   </div>
                 </AccordionContent>
@@ -458,14 +467,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                 <AccordionTrigger className="hover:no-underline text-left">
                   <div className="flex items-center justify-between w-full">
                     <span className="font-medium mr-2 text-sm sm:text-base">Structure</span>
-                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(response.structure.score)}`}>{response.structure.score}/100</span>
+                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(aiResponse?.analysis?.structure?.score || 0)}`}>{aiResponse?.analysis?.structure?.score || 0}/100</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
                     {/* Summary Tips Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                      {response.structure.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.structure?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
                             src={tip.type === 'good' ? "src/assets/public/icons/check.svg" : "src/assets/public/icons/warning.svg"} 
@@ -474,12 +483,12 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                           />
                           <span className="text-xs sm:text-sm font-medium text-gray-700">{tip.tip}</span>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
 
                     {/* Detailed Explanation Boxes */}
                     <div className="space-y-3 sm:space-y-4">
-                      {response.structure.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.structure?.tips?.map((tip, index) => (
                         <div key={index} className={`${
                           tip.type === 'good' ? 'bg-teal-50 border-teal-200' : 'bg-yellow-50 border-yellow-200'
                         } border rounded-lg p-3 sm:p-4`}>
@@ -498,14 +507,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                               <ul className={`text-xs sm:text-sm list-disc list-inside space-y-1 ${
                                 tip.type === 'good' ? 'text-teal-700' : 'text-yellow-700'
                               }`}>
-                                {tip.points.map((point, pointIndex) => (
+                                {tip.points?.map((point, pointIndex) => (
                                   <li key={pointIndex}>{point}</li>
-                                ))}
+                                )) || []}
                               </ul>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
                   </div>
                 </AccordionContent>
@@ -515,14 +524,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                 <AccordionTrigger className="hover:no-underline text-left">
                   <div className="flex items-center justify-between w-full">
                     <span className="font-medium mr-2 text-sm sm:text-base">Skills</span>
-                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(response.skills.score)}`}>{response.skills.score}/100</span>
+                    <span className={`text-xs px-2 py-1 rounded ${getCategoryStyle(aiResponse?.analysis?.skills?.score || 0)}`}>{aiResponse?.analysis?.skills?.score || 0}/100</span>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4">
                     {/* Summary Tips Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                      {response.skills.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.skills?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
                             src={tip.type === 'good' ? "src/assets/public/icons/check.svg" : "src/assets/public/icons/warning.svg"} 
@@ -531,12 +540,12 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                           />
                           <span className="text-xs sm:text-sm font-medium text-gray-700">{tip.tip}</span>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
 
                     {/* Detailed Explanation Boxes */}
                     <div className="space-y-3 sm:space-y-4">
-                      {response.skills.tips.map((tip, index) => (
+                      {aiResponse?.analysis?.skills?.tips?.map((tip, index) => (
                         <div key={index} className={`${
                           tip.type === 'good' ? 'bg-teal-50 border-teal-200' : 'bg-yellow-50 border-yellow-200'
                         } border rounded-lg p-3 sm:p-4`}>
@@ -555,14 +564,14 @@ const ResumeReview = ({ response }: { response: Feedback }) => {
                               <ul className={`text-xs sm:text-sm list-disc list-inside space-y-1 ${
                                 tip.type === 'good' ? 'text-teal-700' : 'text-yellow-700'
                               }`}>
-                                {tip.points.map((point, pointIndex) => (
+                                {tip.points?.map((point, pointIndex) => (
                                   <li key={pointIndex}>{point}</li>
-                                ))}
+                                )) || []}
                               </ul>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )) || []}
                     </div>
                   </div>
                 </AccordionContent>
