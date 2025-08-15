@@ -160,13 +160,13 @@ const ResumeReview = () => {
 
     switch (category) {
       case "good":
-        return "src/public/ats-good.svg";
+        return "/images/ats-good.svg";
       case "warning":
-        return "src/public/ats-warning.svg";
+        return "/images/ats-warning.svg";
       case "bad":
-        return "src/public/ats-bad.svg";
+        return "/images/ats-bad.svg";
       default:
-        return "src/public/ats-good.svg";
+        return "/images/ats-good.svg";
     }
   }
 
@@ -205,7 +205,7 @@ const ResumeReview = () => {
 
           {/* PDF Display Section */}
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 lg:p-6 order-2 xl:order-1" style={{
-            backgroundImage: "url('src/assets/public/images/bg-small.svg')",
+            backgroundImage: "url('/images/bg-small.svg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat"
@@ -363,7 +363,7 @@ const ResumeReview = () => {
                       {aiResponse?.analysis?.toneAndStyle?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
-                            src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                            src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                             alt={tip.type === 'good' ? "Good" : "Warning"} 
                             className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5' 
                           />
@@ -381,7 +381,7 @@ const ResumeReview = () => {
                           <div className='flex gap-2'>
                             <div>
                               <img 
-                                src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                                src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                                 alt={tip.type === 'good' ? "Check" : "Warning"} 
                                 className='w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0' 
                               />
@@ -420,7 +420,7 @@ const ResumeReview = () => {
                       {aiResponse?.analysis?.content?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
-                            src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                            src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                             alt={tip.type === 'good' ? "Good" : "Warning"} 
                             className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5' 
                           />
@@ -438,7 +438,7 @@ const ResumeReview = () => {
                           <div className='flex gap-2'>
                             <div>
                               <img 
-                                src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                                src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                                 alt={tip.type === 'good' ? "Check" : "Warning"} 
                                 className='w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0' 
                               />
@@ -477,7 +477,7 @@ const ResumeReview = () => {
                       {aiResponse?.analysis?.structure?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
-                            src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                            src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                             alt={tip.type === 'good' ? "Good" : "Warning"} 
                             className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5' 
                           />
@@ -495,7 +495,7 @@ const ResumeReview = () => {
                           <div className='flex gap-2'>
                             <div>
                               <img 
-                                src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                                src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                                 alt={tip.type === 'good' ? "Check" : "Warning"} 
                                 className='w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0' 
                               />
@@ -534,7 +534,7 @@ const ResumeReview = () => {
                       {aiResponse?.analysis?.skills?.tips?.map((tip, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <img 
-                            src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                            src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                             alt={tip.type === 'good' ? "Good" : "Warning"} 
                             className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 mt-0.5' 
                           />
@@ -552,7 +552,7 @@ const ResumeReview = () => {
                           <div className='flex gap-2'>
                             <div>
                               <img 
-                                src={tip.type === 'good' ? "src/public/check.svg" : "src/public/warning.svg"} 
+                                src={tip.type === 'good' ? "/images/check.svg" : "/images/warning.svg"} 
                                 alt={tip.type === 'good' ? "Check" : "Warning"} 
                                 className='w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0' 
                               />
