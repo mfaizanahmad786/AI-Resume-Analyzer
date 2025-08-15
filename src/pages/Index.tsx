@@ -13,7 +13,7 @@ const Index = () => {
   return (
     <div 
       className='min-h-screen bg-cover bg-center bg-no-repeat bg-fixed'
-      style={{ backgroundImage: "url('/src/assets/public/images/bg-main.svg')" }}
+      style={{ backgroundImage: "url('/images/bg-main.svg')" }}
     >
       <div className='min-h-screen bg-white/10 backdrop-blur-[0.5px]'>
         <Header/>
@@ -51,17 +51,17 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 mt-10">
           <div className="flex justify-center items-end gap-0 -space-x-4 sm:-space-x-8 lg:-space-x-12">
             <img 
-              src="/src/assets/public/images/resume_01.png" 
+              src="/images/resume_01.png" 
               alt="Resume 1" 
               className="w-full max-w-[120px] sm:max-w-sm lg:max-w-md h-auto rounded-lg hover:shadow-xl transition-all duration-300 z-10 border-[10px] border-[rgba(144,215,255,0.27)] shadow-[0px_4px_30px_rgba(14,15,42,0.15),0px_15px_60px_rgba(14,15,42,0.2)]"
             />
             <img 
-              src="/src/assets/public/images/resume_02.png" 
+              src="/images/resume_02.png" 
               alt="Resume 2" 
               className="w-full max-w-[120px] sm:max-w-sm lg:max-w-md h-auto rounded-lg hover:shadow-2xl transition-all duration-300 -translate-y-4 sm:-translate-y-8 lg:-translate-y-25 z-30 border-[10px] border-[rgba(144,215,255,0.27)] shadow-[0px_4px_30px_rgba(14,15,42,0.15),0px_15px_60px_rgba(14,15,42,0.2)]"
             />
             <img 
-              src="/src/assets/public/images/resume_03.png" 
+              src="/images/resume_03.png" 
               alt="Resume 3" 
               className="w-full max-w-[120px] sm:max-w-sm lg:max-w-md h-auto rounded-lg hover:shadow-xl transition-all duration-300 z-10 border-[10px] border-[rgba(144,215,255,0.27)] shadow-[0px_4px_30px_rgba(14,15,42,0.15),0px_15px_60px_rgba(14,15,42,0.2)]"
             />

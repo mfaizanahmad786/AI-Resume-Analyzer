@@ -111,7 +111,7 @@ const UploadResume = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-main" style={{ backgroundImage: "url('/src/assets/public/images/bg-main.svg')" }}>
+    <div className="min-h-screen bg-gradient-main" style={{ backgroundImage: "url('/images/bg-main.svg')" }}>
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 max-w-2xl mx-auto">
@@ -211,7 +211,7 @@ const UploadResume = () => {
                 />
                 <label htmlFor="resume-upload" className="cursor-pointer">
                   <img 
-                    src="/src/assets/public/images/pdf.png" 
+                    src="/images/pdf.png" 
                     alt="Upload resume" 
                     className="w-12 h-12 mx-auto mb-4 object-contain"
                   />

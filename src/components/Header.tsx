@@ -31,7 +31,7 @@ const Header = () => {
                             onClick={() => navigate('/')}
                         >
                             <img 
-                                src="/src/assets/public/images/header-logo.png" 
+                                src="/images/header-logo.png" 
                                 alt="RESUMIND Logo" 
                                 className="h-8 sm:h-10 lg:h-12 w-auto object-contain"
                             />

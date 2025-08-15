@@ -165,7 +165,7 @@ const AnalysisLoading = () => {
           {/* Resume Illustration */}
           <div className="flex justify-center mb-8">
             <img 
-              src="/src/assets/public/images/resume-scan.gif" 
+              src="/images/resume-scan.gif" 
               alt="Resume scanning animation" 
               className="w-full max-w-lg h-auto rounded-lg "
             />
