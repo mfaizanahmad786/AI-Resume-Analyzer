@@ -8,13 +8,13 @@ import { getAI,getGenerativeModel,GoogleAIBackend } from 'firebase/ai';
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAGYxXtC4RghTgw9vftV04Far5zJJdYu50",
-  authDomain: "resume-analyzer-43953.firebaseapp.com",
-  projectId: "resume-analyzer-43953",
-  storageBucket: "resume-analyzer-43953.firebasestorage.app",
-  messagingSenderId: "500573787788",
-  appId: "1:500573787788:web:17f74e55866b7da5864da9",
-  measurementId: "G-XE6526075Z"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 
