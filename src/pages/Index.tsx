@@ -1,6 +1,4 @@
 import Header from '@/components/Header'
-import {ApplicationCard} from '@/components/ApplicationCard'
-import {resumes} from '@/data/applications'
 import { useAuth } from '@/context/Context'
 
 
@@ -11,7 +9,6 @@ const Index = () => {
     return null; // or a loading state
   }
   
-  const { user } = auth;
 
   return (
     <div 

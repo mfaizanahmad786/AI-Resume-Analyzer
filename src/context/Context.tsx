@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const login = async (email: string, password: string) => {
         try {
-            const { user } = await signInWithEmailAndPassword(auth, email, password)
+            await signInWithEmailAndPassword(auth, email, password)
             console.log('User signed in')
             
         } catch (error) {
@@ -83,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             await sendPasswordResetEmail(auth, email)
         } catch (e) {
             console.log(e)
+            throw e
         }
     }
 
