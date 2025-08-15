@@ -34,7 +34,7 @@ const ReviewHeader: React.FC<ReviewHeaderProps> = ({ companyName, jobTitle }) =>
               className='flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm flex-shrink-0'
               onClick={() => navigate('/')}
             >
-              <img src="/src/assets/public/icons/back.svg" alt="Back" className="w-3 h-3 sm:w-4 sm:h-4" />
+              <img src="/images/back.svg" alt="Back" className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline">Back to Home</span>
               <span className="xs:hidden">Back</span>
             </Button>
