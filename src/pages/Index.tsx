@@ -1,9 +1,11 @@
 import Header from '@/components/Header'
 import { useAuth } from '@/context/Context'
+import { useNavigate } from 'react-router-dom'
 
 
 const Index = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
   
   if (!auth) {
     return null; // or a loading state
@@ -36,7 +38,7 @@ const Index = () => {
             
             {/* CTA Button */}
             <button 
-              onClick={() => window.location.href = '/signup'}
+              onClick={() => navigate('/signup')}
               className="inline-flex items-center px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl "
             >
               Analyze for free ↗
